@@ -1,0 +1,8 @@
+1. add encrytion while entering passwords
+2. make student IDs to accept characters (Done)
+3. add ASCII banner
+4. Add student login(View own course)
+5. GPA Calculation
+6. Quiz making (Teacher)
+7. Quiz attempting (Student)
+8. Prevent assigning more than N credits

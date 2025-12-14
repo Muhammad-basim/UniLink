@@ -1,0 +1,40 @@
+# Project: UniLink
+# Makefile created by Dev-C++ 5.11
+
+CPP      = g++.exe
+CC       = gcc.exe
+WINDRES  = windres.exe
+OBJ      = src/main.o src/admin.o src/fileio.o src/utils.o src/teacher.o
+LINKOBJ  = src/main.o src/admin.o src/fileio.o src/utils.o src/teacher.o
+LIBS     = -L"D:/Softwares/installed/Dev-Cpp/MinGW64/lib" -L"D:/Softwares/installed/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc
+INCS     = -I"D:/Softwares/installed/Dev-Cpp/MinGW64/include" -I"D:/Softwares/installed/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"D:/Softwares/installed/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
+CXXINCS  = -I"D:/Softwares/installed/Dev-Cpp/MinGW64/include" -I"D:/Softwares/installed/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"D:/Softwares/installed/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"D:/Softwares/installed/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
+BIN      = UniLink.exe
+CXXFLAGS = $(CXXINCS) 
+CFLAGS   = $(INCS) 
+RM       = rm.exe -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+src/main.o: src/main.c
+	$(CC) -c src/main.c -o src/main.o $(CFLAGS)
+
+src/admin.o: src/admin.c
+	$(CC) -c src/admin.c -o src/admin.o $(CFLAGS)
+
+src/fileio.o: src/fileio.c
+	$(CC) -c src/fileio.c -o src/fileio.o $(CFLAGS)
+
+src/utils.o: src/utils.c
+	$(CC) -c src/utils.c -o src/utils.o $(CFLAGS)
+
+src/teacher.o: src/teacher.c
+	$(CC) -c src/teacher.c -o src/teacher.o $(CFLAGS)

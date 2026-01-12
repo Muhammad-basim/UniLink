@@ -21,17 +21,21 @@ void list_courses(void);
 void update_courses(const char *courseID, const char *newName, int newCredits);
 int delete_course(const char *courseID);
 
-int course_exists(const char *courseID);
-
+//Student Course Management
 int assign_course_to_student(const char *id, const char *courseID);
 void list_student_courses(const char *id);
 int remove_course_from_student(const char *id, const char *courseID);
 
+//Teacher Course Management
 int get_teacher_info(const char *id, char *name, char *dept);
-
 int assign_course_to_teacher(const char *teacherID, const char *courseID);
 void list_teacher_courses(const char *teacherID);
 int remove_course_from_teacher(const char *teacherID, const char *courseID);
+
+//Helper Functions Prototype
+int course_exists(const char *courseID);
+int get_course_credits(const char *courseID);
+int get_student_total_credits(const char *studentID);
 
 #endif
 

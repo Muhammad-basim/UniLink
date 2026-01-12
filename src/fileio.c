@@ -10,6 +10,8 @@
 #define COURSES_FILE "data/courses.csv"
 
 #define LINE_LEN 256
+#define MAX_CREDITS 18
+#define MAX_TEACHER_COURSES 4
 
 //Student Management
 int add_student(const char *id, const char *name, const char *dept, const char *pass) {
@@ -32,26 +34,18 @@ void list_students(void) {
     }
     char line[LINE_LEN];
     printf("\n--- Students List ---\n");
+    printf("------------------------------------------------\n");
+    printf("%-12s | %-20s | Department\n", "ID", "Name");
+    printf("------------------------------------------------\n");
     while (fgets(line, sizeof(line), f)) {
-//        char *token = strtok(line, ",");
-//        if (!token) continue;
-//		char *roll = token ? token : "";
-//		
-//        token = strtok(NULL, ",");
-//        char *name = token ? token : "";
-//
-//        token = strtok(NULL, ",");
-//        char *dept = token ? token : "";
-//
-//        token = strtok(NULL, ",");
-//        char *pass = token ? token : "";
 		line[strcspn(line, "\r\n")] = 0;
 		char *id = strtok(line, ",");
         char *name = strtok(NULL, ",");
         char *dept = strtok(NULL, ",");
         char *pass = strtok(NULL, ",");
         if (!id || !name || !dept) continue;
-        printf("ID: %-5s | Name: %-15s | Dept: %-10s\n", id, name, dept);
+        //printf("ID: %-5s | Name: %-20s | Dept: %-10s\n", id, name, dept);
+        printf("%-5s | %-20s | %-10s\n", id, name, dept);
     }
     fclose(f);
 }
@@ -62,46 +56,35 @@ int delete_student(const char *roll) {
         printf("No students found!\n");
         return 0;
     }
-
     FILE *temp = fopen("data/temp.csv", "w");
     if (!temp) {
         printf("Failed to create temp file!\n");
         fclose(f);
         return 0;
     }
-
     char line[LINE_LEN];
     int found = 0;
-
     while (fgets(line, sizeof(line), f)) {
         char copy[LINE_LEN];
         strcpy(copy, line);
-
         char *token = strtok(copy, ",");
         char *file_roll = token;
-
         if (file_roll && strcmp(file_roll, roll) == 0) {
             found = 1;
             continue;   // skip this student
         }
-
         fputs(line, temp);
     }
-
     fclose(f);
     fclose(temp);
-
     remove(STUDENTS_FILE);
     rename("data/temp.csv", STUDENTS_FILE);
-
     if (found)
         printf("Student with ID %s deleted successfully!\n", roll);
     else
         printf("Student not found!\n");
-
     return found;
 }
-
 
 int update_student(const char *id, const char *newName, const char *newDept, const char *newPass) {
     FILE *f = fopen(STUDENTS_FILE, "r");
@@ -109,69 +92,55 @@ int update_student(const char *id, const char *newName, const char *newDept, con
         printf("No students found!\n");
         return 0;
     }
-
     FILE *temp = fopen("data/temp.csv", "w");
     if (!temp) {
         printf("Error creating temporary file!\n");
         fclose(f);
         return 0;
     }
-
     char line[LINE_LEN];
     int found = 0;
-
     while (fgets(line, sizeof(line), f)) {
         char copy[LINE_LEN];
         strcpy(copy, line);
         copy[strcspn(copy, "\r\n")] = '\0'; // remove trailing newline(s)
-
         char *file_id   = strtok(copy, ",");
         char *oldName   = strtok(NULL, ",");
         char *oldDept   = strtok(NULL, ",");
         char *oldPass   = strtok(NULL, ",");
-
         if (!file_id) {
             /* malformed line, write as-is */
             fprintf(temp, "%s", line);
             continue;
         }
-
         /* make sure tokens are not NULL before using them */
         if (!oldName) oldName = "";
         if (!oldDept) oldDept = "";
         if (!oldPass) oldPass = "";
-
         /* trim any trailing newline/carriage return from old tokens */
         oldName[strcspn(oldName, "\r\n")] = '\0';
         oldDept[strcspn(oldDept, "\r\n")] = '\0';
         oldPass[strcspn(oldPass, "\r\n")] = '\0';
-
         if (strcmp(file_id, id) == 0) {
             found = 1;
-
             const char *finalName = (newName && newName[0] != '\0') ? newName : oldName;
             const char *finalDept = (newDept && newDept[0] != '\0') ? newDept : oldDept;
             const char *finalPass = (newPass && newPass[0] != '\0') ? newPass : oldPass;
-
             fprintf(temp, "%s,%s,%s,%s\n", file_id, finalName, finalDept, finalPass);
         } else {
             /* write the original line exactly as it was read */
             fprintf(temp, "%s", line);
         }
     }
-
     fclose(f);
     fclose(temp);
-
     /* replace original file */
     remove(STUDENTS_FILE);
     rename("data/temp.csv", STUDENTS_FILE);
-
     if (found)
         printf("Student with ID %s updated successfully!\n", id);
     else
         printf("Student not found!\n");
-
     return found;
 }
 
@@ -181,44 +150,40 @@ void search_student(const char *id) {
         printf("No students found!\n");
         return;
     }
-
     char line[LINE_LEN];
     int found = 0;
-
     while (fgets(line, sizeof(line), f)) {
         char copy[LINE_LEN];
         strcpy(copy, line);
-
         char *file_roll = strtok(copy, ",");
         char *name      = strtok(NULL, ",");
         char *dept      = strtok(NULL, ",");
         char *pass      = strtok(NULL, ",");
-
         if (!file_roll) continue;
         if (!name)  name  = "";
         if (!dept)  dept  = "";
         if (!pass)  pass  = "";
-
         // clean newline
         pass[strcspn(pass, "\n")] = '\0';
-
         // compare student ID
         if (strcmp(file_roll, id) == 0) {
             found = 1;
-
             printf("\n--- Student Found ---\n");
-            printf("ID: %s\n", file_roll);
-            printf("Name: %s\n", name);
-            printf("Department: %s\n", dept);
-            printf("Password: %s\n", pass);
+	        printf("Student ID : %s\n", file_roll);
+	        printf("Name       : %s\n", name);
+	        printf("Department : %s\n", dept);
+	        printf("Password   : %s\n", pass);
+			//printf("ID: %s\n", file_roll);
+			//printf("Name: %s\n", name);
+			//printf("Department: %s\n", dept);
+			//printf("Password: %s\n", pass);
+            //printf("Student ID: %20s\nName: %19s\nDepartment: %s\nPassword: %5s\n", file_roll, name, dept,pass);
             break;
         }
     }
-
     if (!found) {
         printf("Student with ID %s not found!\n", id);
     }
-
     fclose(f);
 }
 
@@ -230,10 +195,8 @@ int add_teacher(const char *id, const char *name, const char *dept, const char *
         printf("Failed to open teachers file!\n");
         return 0;
     }
-
     fprintf(f, "%s,%s,%s,%s\n", id, name, dept, pass);
     fclose(f);
-
     printf("Teacher added successfully!\n");
     return 1;
 }
@@ -244,30 +207,27 @@ void list_teachers(void) {
         printf("No teachers found!\n");
         return;
     }
-
     char line[256];
     printf("\n--- Teachers List ---\n");
-
+    printf("------------------------------------\n");
+    printf("%-5s | %-15s | Department\n", "ID", "Name");
+    printf("------------------------------------\n");
     while (fgets(line, sizeof(line), f)) {
         char copy[256];
         strcpy(copy, line);
-
         char *id = strtok(copy, ",");
         char *name = strtok(NULL, ",");
         char *dept = strtok(NULL, ",");
         char *pass = strtok(NULL, ",");
-
         if (!id) continue;
         if (!name) name = "";
         if (!dept) dept = "";
         if (!pass) pass = "";
-
         char *p = strchr(pass, '\n');
         if (p) *p = '\0';
-
-        printf("ID: %-5s | Name: %-15s | Dept: %-10s\n", id, name, dept);
+        //printf("ID: %-5s | Name: %-15s | Dept: %-10s\n", id, name, dept);
+        printf("%-5s | %-15s | %-10s\n", id, name, dept);
     }
-
     fclose(f);
 }
 
@@ -277,42 +237,33 @@ int delete_teacher(const char *id) {
         printf("No teachers found!\n");
         return 0;
     }
-
     FILE *temp = fopen("data/temp.csv", "w");
     if (!temp) {
         printf("Failed to create temp file!\n");
         fclose(f);
         return 0;
     }
-
     char line[256];
     int found = 0;
-
     while (fgets(line, sizeof(line), f)) {
         char copy[256];
         strcpy(copy, line);
-
         char *tid = strtok(copy, ",");
-
         if (tid && strcmp(tid, id) == 0) {
             found = 1;
             continue;
         }
-
         fputs(line, temp);
     }
 
     fclose(f);
     fclose(temp);
-
     remove(TEACHERS_FILE);
     rename("data/temp.csv", TEACHERS_FILE);
-
     if (found)
         printf("Teacher with ID %s deleted successfully!\n", id);
     else
         printf("Teacher not found!\n");
-
     return found;
 }
 
@@ -322,57 +273,45 @@ int update_teacher(const char *id, const char *newName, const char *newDept, con
         printf("No teachers found!\n");
         return 0;
     }
-
     FILE *temp = fopen("data/temp.csv", "w");
     if (!temp) {
         printf("Failed to create temp file!\n");
         fclose(f);
         return 0;
     }
-
     char line[256];
     int found = 0;
-
     while (fgets(line, sizeof(line), f)) {
         char copy[256];
         strcpy(copy, line);
-
         char *tid = strtok(copy, ",");
         char *oldName = strtok(NULL, ",");
         char *oldDept = strtok(NULL, ",");
         char *oldPass = strtok(NULL, ",");
-
         if (!tid) continue;
         if (!oldName) oldName = "";
         if (!oldDept) oldDept = "";
         if (!oldPass) oldPass = "";
         char *p = strchr(oldPass, '\n');
         if (p) *p = '\0';
-
         if (strcmp(tid, id) == 0) {
             found = 1;
-
             const char *finalName = (strlen(newName) > 0) ? newName : oldName;
             const char *finalDept = (strlen(newDept) > 0) ? newDept : oldDept;
             const char *finalPass = (strlen(newPass) > 0) ? newPass : oldPass;
-
             fprintf(temp, "%s,%s,%s,%s\n", id, finalName, finalDept, finalPass);
         } else {
             fputs(line, temp);
         }
     }
-
     fclose(f);
     fclose(temp);
-
     remove(TEACHERS_FILE);
     rename("data/temp.csv", TEACHERS_FILE);
-
     if (found)
         printf("Teacher with ID %s updated successfully!\n", id);
     else
         printf("Teacher not found!\n");
-
     return found;
 }
 
@@ -382,26 +321,21 @@ void search_teacher(const char *id) {
         printf("No teachers found!\n");
         return;
     }
-
     char line[256];
     int found = 0;
-
     while (fgets(line, sizeof(line), f)) {
         char copy[256];
         strcpy(copy, line);
-
         char *tid = strtok(copy, ",");
         char *name = strtok(NULL, ",");
         char *dept = strtok(NULL, ",");
         char *pass = strtok(NULL, ",");
-
         if (!tid) continue;
         if (!name) name = "";
         if (!dept) dept = "";
         if (!pass) pass = "";
         char *p = strchr(pass, '\n');
         if (p) *p = '\0';
-
         if (strcmp(tid, id) == 0) {
             found = 1;
             printf("\n--- Teacher Found ---\n");
@@ -409,9 +343,7 @@ void search_teacher(const char *id) {
             break;
         }
     }
-
     if (!found) printf("Teacher with ID %s not found!\n", id);
-
     fclose(f);
 }
 
@@ -436,7 +368,9 @@ void list_courses(void) {
     }
     char line[256];
     printf("\n--- Courses List ---\n");
+    printf("-----------------------------------------------------\n");
     printf("%-10s | %-30s | Credits\n", "CourseID", "Course Name");
+    printf("-----------------------------------------------------\n");
     while (fgets(line, sizeof(line), f)) {
         char copy[256];
         strcpy(copy, line);
@@ -530,82 +464,66 @@ int delete_course(const char *courseID) {
     return found;
 }
 
+
+//Student Course Management
 int assign_course_to_student(const char *studentID, const char *courseID) {
-    FILE *sf = fopen("data/students.csv", "r");
-    if (!sf) {
-        printf("Students file not found!\n");
+    char name[50]="", dept[50]="";
+    // --- 1. Get student info
+    if (!get_student_info(studentID, name, dept)) {
+        printf("Student '%s' not found!\n", studentID);
         return 0;
     }
-    char student_name[50] = "";
-    char student_dept[50] = "";
-    char line[256];
-    // ----- FIND STUDENT INFO -----
-    while (fgets(line, sizeof(line), sf)) {
-        char copy[256];
-        strcpy(copy, line);
-        char *id   = strtok(copy, ",");
-        char *name = strtok(NULL, ",");
-        char *dept = strtok(NULL, ",");
-        if (!id) continue;
-        if (strcmp(id, studentID) == 0) {
-            if (name) strncpy(student_name, name, sizeof(student_name)-1);
-            if (dept) strncpy(student_dept, dept, sizeof(student_dept)-1);
-            break;
-        }
-    }
-    fclose(sf);
-    if (strlen(student_name) == 0) {
-        printf("Student with ID %s not found!\n", studentID);
-        return 0;
-    }
+    // --- 2. Check course exists
     if (!course_exists(courseID)) {
-    	printf("Course with ID %s does not exist!\n", courseID);
-    	return 0;
-	}
-    // ----- UPDATE student_courses.csv -----
+        printf("Course '%s' does not exist!\n", courseID);
+        return 0;
+    }
+    // --- 3. Prevent duplicate course
+    if (student_has_course(studentID, courseID)) {
+        printf("Course '%s' already assigned to this student.\n", courseID);
+        return 0;
+    }
+    // --- 4. Check credit limit
+    int currentCredits = get_student_total_credits(studentID);
+    int newCredits = get_course_credits(courseID);
+    if (currentCredits + newCredits > MAX_CREDITS) {
+		printf("\nCannot assign course '%s' to student '%s'!\n", courseID, studentID);
+		printf("Current Credits : %d\n", currentCredits);
+	    printf("Course(%s) Credits : %d\n",courseID, newCredits);
+	    printf("Maximum Allowed : %d\n", MAX_CREDITS);
+        return 0;
+    }
+    // --- 5. Update CSV
     FILE *f = fopen("data/student_courses.csv", "r");
     FILE *temp = fopen("data/temp.csv", "w");
-    if (!temp) {
-        printf("Failed to create temp file!\n");
-        if (f) fclose(f);
-        return 0;
-    }
-    int found = 0;
+    if (!temp) { if(f) fclose(f); printf("Temp file error\n"); return 0; }
+    int studentFound = 0;
+    char line[512];
     if (f) {
         while (fgets(line, sizeof(line), f)) {
-            char copy[256];
-            strcpy(copy, line);
-            char *id = strtok(copy, ",");
-            if (!id) continue;
+            char copy[512]; strcpy(copy, line);
+            char *id = strtok(copy, ",\n");
+            if (!id) { fputs(line, temp); continue; }
+            trim(id);
             if (strcmp(id, studentID) == 0) {
-                found = 1;
-                // remove newline
+                studentFound = 1;
                 line[strcspn(line, "\n")] = '\0';
-                // duplicate checking
-                char check[64];
-				snprintf(check, sizeof(check), ",%s", courseID);
-                if (strstr(line, check)) {
-				    printf("Course already assigned!\n");
-				    fprintf(temp, "%s\n", line);
-				    continue;
-				}
-                // append new course
                 fprintf(temp, "%s,%s\n", line, courseID);
-            }
-            else {
-                fprintf(temp, "%s", line);
+                printf("Course '%s' assigned successfully!\n", courseID);
+            } else {
+                fputs(line, temp);
             }
         }
         fclose(f);
     }
-    // student not present yet ? create new entry
-    if (!found) {
-        fprintf(temp,"%s,%s,%s,%s\n",studentID,student_name,student_dept,courseID);
+    // Student not in CSV yet
+    if (!studentFound) {
+        fprintf(temp, "%s,%s,%s,%s\n", studentID, name, dept, courseID);
+        printf("Course '%s' assigned successfully!\n", courseID);
     }
     fclose(temp);
     remove("data/student_courses.csv");
     rename("data/temp.csv", "data/student_courses.csv");
-    printf("Course assigned successfully!\n");
     return 1;
 }
 
@@ -615,42 +533,50 @@ void list_student_courses(const char *studentID) {
         printf("No course assignments found!\n");
         return;
     }
-    char line[256];
+    char line[512];
     int found = 0;
     while (fgets(line, sizeof(line), f)) {
-        char copy[256];
+        char copy[512];
         strcpy(copy, line);
-        char *id   = strtok(copy, ",");
-        char *name = strtok(NULL, ",");
-        char *dept = strtok(NULL, ",");
-        if (!id) continue;
-        // --- compare student IDs ---
-        if (strcmp(id, studentID) == 0) {
-            found = 1;
-            // Clean values
-            if (!name) name = "";
-            if (!dept) dept = "";
-            dept[strcspn(dept, "\n")] = '\0';
-            printf("\nStudent ID: %s\n", id);
-            printf("Name: %s\n", name);
-            printf("Department: %s\n", dept);
-            printf("Assigned Courses: ");
-            // remaining fields = courses
-            char *course = strtok(NULL, ",");
-            int first = 1;
-            while (course) {
-                course[strcspn(course, "\n")] = '\0';
-                if (!first) printf(", ");
-                printf("%s", course);
-                first = 0;
-                course = strtok(NULL, ",");
-            }
-            printf("\n");
-            break;
+        /* tokenize once */
+        char *tokens[50];
+        int count = 0;
+        char *tok = strtok(copy, ",");
+        while (tok && count < 50) {
+            tok[strcspn(tok, "\n")] = '\0';  // remove newline
+            tokens[count++] = tok;
+            tok = strtok(NULL, ",");
         }
+        if (count < 3) continue;  // malformed line
+        /* check if this is the student we want */
+        if (strcmp(tokens[0], studentID) != 0)
+            continue;
+        found = 1;
+        printf("\n--- Student Courses ---\n");
+        printf("Student ID : %s\n", tokens[0]);
+        printf("Name       : %s\n", tokens[1]);
+        printf("Department : %s\n", tokens[2]);
+        printf("Assigned Courses:\n");
+        int totalCredits = 0;
+        if (count == 3) {
+            printf("  None\n");
+        } else {
+        	int i;
+            for (i = 3; i < count; i++) {
+                int credits = get_course_credits(tokens[i]);
+                if (credits > 0) {
+                    printf("  - %s (%d credits)\n", tokens[i], credits);
+                    totalCredits += credits;
+                } else {
+                    printf("  - %s (credits unknown)\n", tokens[i]);
+                }
+            }
+        }
+        printf("\nTotal Credits: %d / %d\n", totalCredits, MAX_CREDITS);
+        break;  // found the student, no need to read more
     }
     if (!found)
-        printf("No courses assigned to ID %s\n", studentID);
+        printf("No courses assigned to student ID '%s'.\n", studentID);
     fclose(f);
 }
 
@@ -667,66 +593,136 @@ int remove_course_from_student(const char *studentID, const char *courseID) {
         return 0;
     }
     char line[512];
-    int found_student = 0, removed = 0;
+    int found_student = 0;
+    int removed_course = 0;
     while (fgets(line, sizeof(line), f)) {
         char copy[512];
         strcpy(copy, line);
-        char *id   = strtok(copy, ",");
-        char *name = strtok(NULL, ",");
-        char *dept = strtok(NULL, ",");
-        if (!id) continue;
-        // clean fields
-        if (!name) name = "";
-        if (!dept) dept = "";
-        name[strcspn(name, "\n")] = '\0';
-        dept[strcspn(dept, "\n")] = '\0';
-        // if this is NOT the student — copy unchanged
+        char *id = strtok(copy, ",");
+        if (!id) { fputs(line, temp); continue; }
         if (strcmp(id, studentID) != 0) {
+            // Not the student we want, copy as is
             fputs(line, temp);
             continue;
         }
-        // This IS the student
         found_student = 1;
-        // collect kept courses
-        char *course = strtok(NULL, ",");
-        char kept[50][50];
-        int kept_count = 0;
-        while (course) {
-            course[strcspn(course, "\n")] = '\0';
-            if (strcmp(course, courseID) == 0) {
-                removed = 1;    // skip this course
-            } else {
-                strcpy(kept[kept_count++], course);
-            }
-            course = strtok(NULL, ",");
+        // Split original line into tokens
+        char *tokens[100];
+        int token_count = 0;
+        char *tok = strtok(line, ",\n");
+        while (tok) {
+            tokens[token_count++] = tok;
+            tok = strtok(NULL, ",\n");
         }
-        if (!removed) {
+        // tokens[0]=ID, tokens[1]=name, tokens[2]=dept, tokens[3..]=courses
+        int i, course_found = 0;
+        for (i = 3; i < token_count; i++) {
+            if (strcmp(tokens[i], courseID) == 0) {
+                course_found = 1; // skip this course
+            }
+        }
+        if (!course_found) {
             printf("Course '%s' not found for this student.\n", courseID);
             fputs(line, temp);
             continue;
         }
-        // Rebuild updated line
-        fprintf(temp, "%s,%s,%s", id, name, dept);
-        int i;
-        for (i = 0; i < kept_count; i++) {
-            fprintf(temp, ",%s", kept[i]);
+        removed_course = 1;
+        // Rebuild line without removed course
+        fprintf(temp, "%s,%s,%s", tokens[0], tokens[1], tokens[2]);
+        for (i = 3; i < token_count; i++) {
+            if (strcmp(tokens[i], courseID) != 0) {
+                fprintf(temp, ",%s", tokens[i]);
+            }
         }
         fprintf(temp, "\n");
     }
     fclose(f);
     fclose(temp);
+    // Replace original file
     remove("data/student_courses.csv");
     rename("data/temp.csv", "data/student_courses.csv");
     if (!found_student) {
-        printf("Student with ID %s not found.\n", studentID);
+        printf("Student with ID %s not found in assignment file.\n", studentID);
         return 0;
     }
-    if (!removed) return 0;
-    printf("Course '%s' removed successfully!\n", courseID);
+    if (!removed_course) {
+        return 0;
+    }
+    printf("Course '%s' removed successfully from student %s!\n", courseID, studentID);
     return 1;
 }
 
+void calculate_student_gpa() {
+    char studentID[20];
+    read_line("Enter Student ID", studentID, sizeof(studentID));
+    FILE *fm = fopen("data/course_marks.csv", "r");
+    if (!fm) {
+        printf("Marks file not found.\n");
+        return;
+    }
+    float totalWeighted = 0.0;
+    float totalCredits = 0.0;
+    char line[256];
+    int found = 0;
+    while (fgets(line, sizeof(line), fm)) {
+        char copy[256];
+        strcpy(copy, line);
+        char *courseID = strtok(copy, ",");
+        char *sid = strtok(NULL, ",");
+        char *marksStr = strtok(NULL, ",\n");
+        if (!courseID || !sid || !marksStr)
+            continue;
+        trim(courseID);
+		trim(sid);
+		trim(marksStr);
+        if (strcmp(sid, studentID) == 0) {
+            float marks = atof(marksStr);
+            float gp = 0.00;
+//            float gp = marks_to_gp(marks);
+            if (marks >= 85) gp = 4.0f;
+		    else if (marks >= 80) gp = 3.7f;
+		    else if (marks >= 75) gp = 3.3f;
+		    else if (marks >= 70) gp = 3.0f;
+		    else if (marks >= 65) gp = 2.7f;
+		    else if (marks >= 60) gp = 2.3f;
+		    else if (marks >= 50) gp = 2.0f;
+		    else gp = 0.0f;
+            
+            int credit = get_course_credits(courseID);
+            if (credit <= 0) {
+			    printf("Warning: Credit hours not found for %s\n", courseID);
+			    continue;
+			}
+			else{
+				printf("\nCourseID: '%s'", courseID);
+				printf("\nMarks   : %.2f", marks);
+				printf("\nCredits : %d\n", credit);
+				totalWeighted += gp * credit;
+                totalCredits += credit;
+                found = 1;
+			}
+        }
+    }
+    fclose(fm);
+    if (!found || totalCredits == 0) {
+        printf("No complete data found for GPA calculation.\n");
+        return;
+    }
+    float gpa = totalWeighted / totalCredits;
+    FILE *fg = fopen("data/student_gpa.csv", "w");
+    if (!fg) {
+        printf("Unable to save GPA.\n");
+        return;
+    }
+    fprintf(fg, "%s,%.2f\n", studentID, gpa);
+    fclose(fg);
+    printf("\nGPA Calculated Successfully\n");
+    printf("Student ID: %s\n", studentID);
+    printf("GPA: %.2f\n", gpa);
+}
 
+
+//Teacher Course Management
 int get_teacher_info(const char *id, char *name, char *dept) {
     FILE *f = fopen("data/teachers.csv", "r");
     if (!f) return 0;
@@ -754,189 +750,170 @@ int get_teacher_info(const char *id, char *name, char *dept) {
 }
 
 int assign_course_to_teacher(const char *teacherID, const char *courseID) {
-    char name[50] = "", dept[50] = "";
-    // 1. Get teacher info
+    char name[50], dept[50];
+    // 1. Validate teacher
     if (!get_teacher_info(teacherID, name, dept)) {
-        printf("Teacher not found!\n");
+        printf("Teacher '%s' not found!\n", teacherID);
+        return 0;
+    }
+    // 2. Validate course
+    if (!course_exists(courseID)) {
+        printf("Course '%s' does not exist!\n", courseID);
+        return 0;
+    }
+    // 3. Enforce course limit
+    int currentCount = get_teacher_course_count(teacherID);
+    if (currentCount >= MAX_TEACHER_COURSES) {
+        printf("Cannot assign course.\n");
+        printf("Teacher already has %d out of %d courses.\n",
+               currentCount, MAX_TEACHER_COURSES);
         return 0;
     }
     FILE *f = fopen("data/teacher_courses.csv", "r");
     FILE *temp = fopen("data/temp.csv", "w");
-    if (!temp) {
-        printf("Cannot create temp file!\n");
-        if (f) fclose(f);
-        return 0;
-    }
-    char line[256];
+    if (!temp) { if (f) fclose(f); return 0; }
+    char line[512];
     int found = 0;
     if (f) {
         while (fgets(line, sizeof(line), f)) {
-            line[strcspn(line, "\r\n")] = 0;  // remove newline
-            char copy[256];
+            char original[512];
+            strcpy(original, line);
+            char copy[512];
             strcpy(copy, line);
-            char *tid = strtok(copy, ",");
-            if (!tid) continue;
-            tid[strcspn(tid, "\r\n")] = 0; // clean newline
-            if (strcmp(tid, teacherID) == 0) {
-            	if (!course_exists(courseID)) {
-			    	printf("Course with ID %s does not exist!\n", courseID);
-			    	return 0;
-				}
+            char *id = strtok(copy, ",");
+            if (!id) {
+                fputs(original, temp);
+                continue;
+            }
+            if (strcmp(id, teacherID) == 0) {
                 found = 1;
                 // check duplicate
-                if (strstr(line, courseID)) {
-                    printf("Course '%s' already assigned to this teacher.\n",courseID);
-                    fprintf(temp, "%s\n", line);
-                    return 0;
+                char *token;
+                int duplicate = 0;
+                strtok(NULL, ","); // name
+                strtok(NULL, ","); // dept
+                while ((token = strtok(NULL, ","))) {
+                    if (strcmp(token, courseID) == 0) {
+                        duplicate = 1;
+                        break;
+                    }
                 }
-                fprintf(temp, "%s,%s,%s", tid, name, dept);
-                // append old courses
-                char *token = strtok(line, ","); // skip tid
-                token = strtok(NULL, ",");       // skip name
-                token = strtok(NULL, ",");       // skip dept
-                token = strtok(NULL, ",");       // first course
-                while (token) {
-                    token[strcspn(token, "\r\n")] = 0;
-                    fprintf(temp, ",%s", token);
-                    token = strtok(NULL, ",");
+                if (duplicate) {
+                    printf("Course '%s' already assigned to this teacher.\n", courseID);
+                    fputs(original, temp);
+                } else {
+                    original[strcspn(original, "\n")] = '\0';
+                    fprintf(temp, "%s,%s\n", original, courseID);
+                    printf("Course '%s' assigned to teacher successfully!\n", courseID);
                 }
-                // append new course
-                fprintf(temp, ",%s\n", courseID);
             } else {
-                fprintf(temp, "%s\n", line);
+                fputs(original, temp);
             }
         }
         fclose(f);
     }
+    // teacher not in file yet
     if (!found) {
         fprintf(temp, "%s,%s,%s,%s\n", teacherID, name, dept, courseID);
+        printf("Course '%s' assigned to teacher successfully!\n", courseID);
     }
     fclose(temp);
     remove("data/teacher_courses.csv");
     rename("data/temp.csv", "data/teacher_courses.csv");
-    printf("Course '%s' assigned to teacher '%s' successfully!\n",courseID, teacherID);
     return 1;
 }
 
 void list_teacher_courses(const char *teacherID) {
     FILE *f = fopen("data/teacher_courses.csv", "r");
     if (!f) {
-        printf("No course assignments found!\n");
+        printf("No teacher course records found.\n");
         return;
     }
-    char line[256];
+    char line[512];
     int found = 0;
     while (fgets(line, sizeof(line), f)) {
-    	line[strcspn(line, "\r\n")] = 0;
-        char copy[256];
+        char copy[512];
         strcpy(copy, line);
-        char *tid = strtok(copy, ",");
-        if (!tid) continue;
-        if (strcmp(tid, teacherID) == 0) {
-            found = 1;
-            char *name = strtok(NULL, ",");
-            char *dept = strtok(NULL, ",");
-
-            printf("\n%-18s %s\n", "Teacher ID:", teacherID);
-			printf("%-18s %s\n", "Name:", name);
-			printf("%-18s %s\n", "Department:", dept);
-			printf("%-18s ",  "Assigned Courses:");
-			
-            char *course = strtok(NULL, ",");
-            int first = 1;
-            while (course) {
-                course[strcspn(course, "\n")] = '\0';
-                if (!first) printf(", ");
-                printf("%s", course);
-                first = 0;
-                course = strtok(NULL, ",");
-            }
-            printf("\n");
+        char *tokens[20];
+        int count = 0;
+        char *tok = strtok(copy, ",\n");
+        while (tok && count < 20) {
+            tokens[count++] = tok;
+            tok = strtok(NULL, ",\n");
         }
+        if (count < 3) continue;
+        if (strcmp(tokens[0], teacherID) != 0) continue;
+        found = 1;
+        printf("\n--- Teacher Courses ---\n");
+        printf("Teacher ID : %s\n", tokens[0]);
+        printf("Name       : %s\n", tokens[1]);
+        printf("Department : %s\n", tokens[2]);
+        printf("Assigned Courses:\n");
+        if (count == 3) {
+            printf("  None\n");
+        } else {
+        	int i;
+            for (i = 3; i < count; i++)
+                printf("  - %s\n", tokens[i]);
+        }
+        break;
     }
     if (!found)
-        printf("No courses assigned to this teacher.\n");
+        printf("No courses assigned to teacher '%s'.\n", teacherID);
     fclose(f);
 }
 
 int remove_course_from_teacher(const char *teacherID, const char *courseID) {
     FILE *f = fopen("data/teacher_courses.csv", "r");
+    if (!f) return 0;
     FILE *temp = fopen("data/temp.csv", "w");
-    if (!f || !temp) {
-        if (f) fclose(f);
-        if (temp) fclose(temp);
-        printf("Error opening files!\n");
-        return 0;
-    }
-    char line[256];
-    int foundTeacher = 0;
-    int removed = 0;
+    if (!temp) { fclose(f); return 0; }
+    char line[512];
+    int found = 0, removed = 0;
     while (fgets(line, sizeof(line), f)) {
-        line[strcspn(line, "\r\n")] = 0;  // remove newline
-        char copy[256];
+        char copy[512];
         strcpy(copy, line);
-        char *tid = strtok(copy, ",");
-        char *tname = strtok(NULL, ",");
-        char *tdept = strtok(NULL, ",");
-        if (!tid || !tname || !tdept) {
-            fprintf(temp, "%s\n", line);
+        char *tokens[20];
+        int count = 0;
+        char *tok = strtok(copy, ",\n");
+        while (tok && count < 20) {
+            tokens[count++] = tok;
+            tok = strtok(NULL, ",\n");
+        }
+        if (count < 3 || strcmp(tokens[0], teacherID) != 0) {
+            fputs(line, temp);
             continue;
         }
-        tid[strcspn(tid, "\r\n")] = 0;
-        tname[strcspn(tname, "\r\n")] = 0;
-        tdept[strcspn(tdept, "\r\n")] = 0;
-        if (strcmp(tid, teacherID) == 0) {
-            foundTeacher = 1;
-            char courses[10][50];  // max 10 courses per teacher
-            int courseCount = 0;
-            char *token = strtok(NULL, ",");
-            while (token) {
-                token[strcspn(token, "\r\n")] = 0;
-                if (strcmp(token, courseID) != 0) {
-                    strcpy(courses[courseCount++], token);
-                } else {
-                    removed = 1;
-                }
-                token = strtok(NULL, ",");
+        found = 1;
+        fprintf(temp, "%s,%s,%s", tokens[0], tokens[1], tokens[2]);
+		int i;
+        for (i = 3; i < count; i++) {
+            if (strcmp(tokens[i], courseID) != 0) {
+                fprintf(temp, ",%s", tokens[i]);
+            } else {
+                removed = 1;
             }
-            // write teacher line back
-            fprintf(temp, "%s,%s,%s", tid, tname, tdept);
-            int i;
-            for (i = 0; i < courseCount; i++)
-                fprintf(temp, ",%s", courses[i]);
-            fprintf(temp, "\n");
-
-        } else {
-            fprintf(temp, "%s\n", line);
         }
+        fprintf(temp, "\n");
     }
     fclose(f);
     fclose(temp);
     remove("data/teacher_courses.csv");
     rename("data/temp.csv", "data/teacher_courses.csv");
-    if (!foundTeacher) {
-        printf("Teacher with '%s' not found!\n", teacherID);
-        return 0;
-    }
-    if (!removed) {
-        printf("Course '%s' not found for teacher '%s'.\n",courseID, teacherID);
-        return 0;
-    }
-    printf("Course '%s' removed from teacher '%s' successfully!\n",courseID,teacherID);
-    return 1;
+    if (!found) printf("Teacher '%s' not found.\n",teacherID);
+    else if (!removed) printf("Course '%s' not found for this teacher.\n",courseID);
+    else printf("Course '%s' removed successfully.\n", courseID);
+    return removed;
 }
 
 
-
 //Helper Functions:
-/* helper: trim leading + trailing whitespace (modifies string in-place) */
-static void trim(char *s) {
+//* helper: trim leading + trailing whitespace (modifies string in-place) */
+void trim(char *s) {
     if (!s) return;
-    /* trim leading */
     char *start = s;
     while (*start && isspace((unsigned char)*start)) start++;
     if (start != s) memmove(s, start, strlen(start)+1);
-    /* trim trailing */
     size_t len = strlen(s);
     while (len > 0 && isspace((unsigned char)s[len-1])) {
         s[len-1] = '\0';
@@ -944,30 +921,198 @@ static void trim(char *s) {
     }
 }
 
+//void trim(char *str) {
+//    // Trim leading spaces
+//    int index = 0;
+//    while (str[index] == ' ' || str[index] == '\t' || str[index] == '\n')
+//        index++;
+//
+//    if (index != 0)
+//        memmove(str, str + index, strlen(str + index) + 1);
+//
+//    // Trim trailing spaces
+//    int end = strlen(str) - 1;
+//    while (end >= 0 && (str[end] == ' ' || str[end] == '\t' || str[end] == '\n')) {
+//        str[end] = '\0';
+//        end--;
+//    }
+//}
+
+
 int course_exists(const char *courseID) {
     FILE *f = fopen("data/courses.csv", "r");
-    if (!f) {
-        printf("Courses file not found!\n");
-        return 0;
-	}
+    if (!f) return 0;
+    char line[256];
+    while (fgets(line, sizeof(line), f)) {
+        char *id = strtok(line, ",\n");
+        if (id) trim(id);
+        if (id && strcmp(id, courseID) == 0) { fclose(f); return 1; }
+    }
+    fclose(f);
+    return 0;
+}
+
+//int get_course_credits(const char *courseID) {
+//    FILE *f = fopen("data/courses.csv", "r");
+//    if (!f) return -1;
+//    char line[256];
+//    while (fgets(line, sizeof(line), f)) {
+//        char *id = strtok(line, ",\n");
+//        char *name = strtok(NULL, ",\n");
+//        char *credits = strtok(NULL, ",\n");
+//        if (!id || !credits) continue;
+//        trim(id); trim(credits);
+//        if (strcmp(id, courseID) == 0) {
+//            fclose(f);
+//            return atoi(credits);
+//        }
+//    }
+//    fclose(f);
+//    return -1;
+//}
+//float marks_to_gp(float marks)
+//{
+//	printf("marks after function: '%.2f'\n", marks);
+//    if (marks >= 85) return 4.0f;
+//    else if (marks >= 80) return 3.7f;
+//    else if (marks >= 75) return 3.3f;
+//    else if (marks >= 70) return 3.0f;
+//    else if (marks >= 65) return 2.7f;
+//    else if (marks >= 60) return 2.3f;
+//    else if (marks >= 50) return 2.0f;
+//    else return 0.0f;
+//}
+
+
+int get_course_credits(const char *courseID) {
+    FILE *f = fopen("data/courses.csv", "r");
+    if (!f) return 0;
     char line[256];
     while (fgets(line, sizeof(line), f)) {
         char copy[256];
         strcpy(copy, line);
-        char *id = strtok(copy, ",");
-        if (!id) continue;
-        id[strcspn(id, "\n")] = '\0';
-        if (strcmp(id, courseID) == 0) {
+        char *cid = strtok(copy, ",");
+        char *name = strtok(NULL, ",");
+        char *creditStr = strtok(NULL, ",\n");
+        if (!cid || !creditStr)
+            continue;
+        trim(cid);
+        trim(creditStr);
+        /* Skip header */
+        if (strcmp(cid, "CourseID") == 0)
+            continue;
+        if (strcmp(cid, courseID) == 0) {
             fclose(f);
-            return 1;
+            return atoi(creditStr);
         }
     }
     fclose(f);
     return 0;
 }
 
+int get_student_info(const char *studentID, char *name, char *dept) {
+    FILE *f = fopen("data/students.csv", "r");
+    if (!f) return 0;
+    char line[256];
+    while (fgets(line, sizeof(line), f)) {
+        char *id = strtok(line, ",\n");
+        char *n  = strtok(NULL, ",\n");
+        char *d  = strtok(NULL, ",\n");
+        if (!id) continue;
+        trim(id); if (strcmp(id, studentID) == 0) {
+            if (n) { strncpy(name, n, 49); name[49]='\0'; trim(name); }
+            if (d) { strncpy(dept, d, 49); dept[49]='\0'; trim(dept); }
+            fclose(f); return 1;
+        }
+    }
+    fclose(f);
+    return 0;
+}
 
+int get_student_total_credits(const char *studentID) {
+    FILE *f = fopen("data/student_courses.csv", "r");
+    if (!f) return 0;
+    char line[512];
+    int total = 0;
+    while (fgets(line, sizeof(line), f)) {
+        char lineCopy[512];
+        strcpy(lineCopy, line);
+        lineCopy[strcspn(lineCopy, "\n")] = '\0';
+        char *tokens[100];
+        int fieldCount = 0;
+        char *token = strtok(lineCopy, ",");
+        while (token && fieldCount < 100) {
+            trim(token);
+            tokens[fieldCount++] = token;
+            token = strtok(NULL, ",");
+        }
+        if (fieldCount < 4) continue; // no courses
 
+        if (strcmp(tokens[0], studentID) == 0) {
+            // sum credits of courses starting from index 3
+            int i;
+            for (i = 3; i < fieldCount; i++) {
+                int credits = get_course_credits(tokens[i]);
+                if (credits > 0) total += credits;
+            }
+            break;
+        }
+    }
+    fclose(f);
+    return total;
+}
+
+int student_has_course(const char *studentID, const char *courseID) {
+    FILE *f = fopen("data/student_courses.csv", "r");
+    if (!f) return 0;
+    char line[512];
+    int found = 0;
+    while (fgets(line, sizeof(line), f)) {
+        char copy[512]; strcpy(copy, line);
+        char *id = strtok(copy, ",\n");
+        if (!id) continue;
+        trim(id);
+        if (strcmp(id, studentID) == 0) {
+            strtok(NULL, ",\n"); // skip name
+            strtok(NULL, ",\n"); // skip dept
+            char *token = NULL;
+            while ((token = strtok(NULL, ",\n")) != NULL) {
+                trim(token);
+                if (strcmp(token, courseID) == 0) { found = 1; break; }
+            }
+            break;
+        }
+    }
+    fclose(f);
+    return found;
+}
+
+int get_teacher_course_count(const char *teacherID) {
+    FILE *f = fopen("data/teacher_courses.csv", "r");
+    if (!f) return 0;
+
+    char line[512];
+    while (fgets(line, sizeof(line), f)) {
+        char copy[512];
+        strcpy(copy, line);
+
+        char *id = strtok(copy, ",");
+        if (!id) continue;
+
+        if (strcmp(id, teacherID) == 0) {
+            int count = 0;
+            strtok(NULL, ","); // name
+            strtok(NULL, ","); // dept
+
+            while (strtok(NULL, ",")) count++;
+            fclose(f);
+            return count;
+        }
+    }
+
+    fclose(f);
+    return 0;
+}
 
 
 

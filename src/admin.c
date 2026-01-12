@@ -12,7 +12,8 @@ int admin_login(void) {
 
     printf("\n--- Admin Login ---\n");
     read_line("Username", user, sizeof(user));
-    read_line("Password", pass, sizeof(pass));
+    //read_line("Password", pass, sizeof(pass));
+    read_password(pass, sizeof(pass), "Password");
 
     FILE *f = fopen("data/admin.txt", "r");
     if (!f) {
@@ -81,6 +82,7 @@ void manage_students(void) {
         printf("3. Update Student Record\n");
         printf("4. Delete Student Record\n");
         printf("5. Search Student Record\n");
+        printf("6. GPA Calculation\n");
         printf("0. Back to Admin Menu\n");
 
         read_line("Enter choice", choice, sizeof(choice));
@@ -127,6 +129,7 @@ void manage_students(void) {
 		
 		    search_student(roll);
 		}
+		else if (c == 6) calculate_student_gpa();
         else if (c == 0) break;
         else printf("Invalid choice.\n");
     }
@@ -333,4 +336,28 @@ void manage_teacher_course_assignments(void) {
 
 
 
+//helper functions:
+
+
+//int get_course_credit(const char *courseID) {
+//    FILE *f = fopen("data/courses.csv", "r");
+//    if (!f) return 0;
+//
+//    char line[256];
+//    while (fgets(line, sizeof(line), f)) {
+//        char copy[256];
+//        strcpy(copy, line);
+//
+//        char *cid = strtok(copy, ",");
+//        strtok(NULL, ","); // course name
+//        char *credit = strtok(NULL, ",\n");
+//
+//        if (cid && credit && strcmp(cid, courseID) == 0) {
+//            fclose(f);
+//            return atoi(credit);
+//        }
+//    }
+//    fclose(f);
+//    return 0;
+//}
 

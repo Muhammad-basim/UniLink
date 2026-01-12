@@ -1,0 +1,9 @@
+========= Teacher Menu =========
+1. View My Profile
+2. View My Assigned Courses
+3. View Students in a Course
+4. Upload Marks (Course-wise)
+5. View Course-wise Student Marks
+6. Change Password
+0. Logout
+================================

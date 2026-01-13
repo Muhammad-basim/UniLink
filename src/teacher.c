@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <windows.h>
 #include "../include/utils.h"
 #include "../include/teacher.h"
 //#include "teacher_fileio.c"
@@ -67,6 +68,7 @@ void teacher_menu(void) {
 
         read_line("Enter choice", choice, sizeof(choice));
         if (!is_number(choice)) {
+        	system("cls");
 	        printf("Invalid choice (numbers only).\n");
 	        continue;
 	    }
@@ -92,9 +94,13 @@ void teacher_menu(void) {
 		    //create_quiz(CURRENT_TEACHER_ID);
 		}
         else if (c == 0) {
+        	system("cls");
             break;
         }
-        else printf("Invalid choice.\n");
+        else{
+        	system("cls");	
+        	printf("Invalid choice.\n");
+		} 
     }
 }
 
@@ -126,9 +132,6 @@ void manage_quiz_menu(const char *teacherID) {
         else printf("Invalid choice.\n");
     }
 }
-
-
-
 
 
 

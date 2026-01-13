@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <windows.h>
 #include "../include/admin.h"
 #include "../include/fileio.h"
 #include "../include/utils.h"
@@ -42,9 +42,12 @@ int admin_login(void) {
 
 void admin_menu(void) {
     char choice[10];
-
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(h, 14);
+	admin_banner();
+	SetConsoleTextAttribute(h, 10);
     while (1) {
-        printf("\n--- Admin Menu ---\n");
+        printf("\n=== Admin Menu ===\n");
         printf("1. Student Management\n");
         printf("2. Teacher Management\n");
         printf("3. Course Management\n");
@@ -67,6 +70,7 @@ void admin_menu(void) {
 		    manage_courses();
 		}
         else if (c == 0) {
+        	system("cls");
             break;
         }
         else printf("Invalid choice.\n");
@@ -337,7 +341,13 @@ void manage_teacher_course_assignments(void) {
 
 
 //helper functions:
-
+void admin_banner(){
+	printf("     _       _           _          __  __                   \n");
+	printf("    / \\   __| |_ __ ___ (_)_ __    |  \\/  | ___ _ __  _   _  \n");
+	printf("   / _ \\ / _` | '_ ` _ \\| | '_ \\   | |\\/| |/ _ \\ '_ \\| | | | \n");
+	printf("  / ___ \\ (_| | | | | | | | | | |  | |  | |  __/ | | | |_| | \n");
+	printf(" /_/   \\_\\__,_|_| |_| |_|_|_| |_|  |_|  |_|\\___|_| |_|\\__,_| \n");                                                 
+}
 
 //int get_course_credit(const char *courseID) {
 //    FILE *f = fopen("data/courses.csv", "r");

@@ -56,6 +56,10 @@ int teacher_login(char *name_buffer, int size) {
 
 void teacher_menu(void) {
     char choice[10];
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(h, 14);
+    teacher_banner();
+	SetConsoleTextAttribute(h, 10);
     while (1) {
         printf("\n--- Teacher Menu ---\n");
         printf("1. View My Assigned Courses\n");
@@ -68,8 +72,9 @@ void teacher_menu(void) {
 
         read_line("Enter choice", choice, sizeof(choice));
         if (!is_number(choice)) {
-        	system("cls");
+        	SetConsoleTextAttribute(h, 12);
 	        printf("Invalid choice (numbers only).\n");
+	        SetConsoleTextAttribute(h, 10);
 	        continue;
 	    }
         int c = atoi(choice);
@@ -98,8 +103,9 @@ void teacher_menu(void) {
             break;
         }
         else{
-        	system("cls");	
-        	printf("Invalid choice.\n");
+        	SetConsoleTextAttribute(h, 12);
+	        printf("Invalid choice.\n");
+	        SetConsoleTextAttribute(h, 10);
 		} 
     }
 }
@@ -107,7 +113,7 @@ void teacher_menu(void) {
 
 void manage_quiz_menu(const char *teacherID) {
     char choice[10];
-
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     while (1) {
         printf("\n--- Manage Quiz ---\n");
         printf("1. Create Quiz\n");
@@ -118,7 +124,9 @@ void manage_quiz_menu(const char *teacherID) {
 
         read_line("Enter choice", choice, sizeof(choice));
         if (!is_number(choice)) {
-            printf("Invalid input.\n");
+        	SetConsoleTextAttribute(h, 12);
+	        printf("Invalid input.\n");
+	        SetConsoleTextAttribute(h, 10);
             continue;
         }
 
@@ -129,7 +137,11 @@ void manage_quiz_menu(const char *teacherID) {
         else if (c == 3) delete_quiz(teacherID);
         else if (c == 4) update_quiz(teacherID);
         else if (c == 0) break;
-        else printf("Invalid choice.\n");
+        else{
+        	SetConsoleTextAttribute(h, 12);
+	        printf("Invalid choice.\n");
+	        SetConsoleTextAttribute(h, 10);
+		}
     }
 }
 

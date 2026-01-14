@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <windows.h>
 #include "../include/teacher.h"
 #include "../include/utils.h"
 #include "../include/teacher_quiz.h"
@@ -59,9 +60,12 @@ void view_my_assigned_courses(const char *teacherID) {
 }
 
 void view_students_in_course(const char *teacherID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen("data/teacher_courses.csv", "r");
     if (!f) {
-        printf("Teacher courses file not found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Teacher courses file not found!\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[512];
@@ -98,7 +102,9 @@ void view_students_in_course(const char *teacherID) {
     char choice[10];
 	read_line("Enter the number of the course to view students", choice, sizeof(choice));
 	if (!is_number(choice)) {
-	    printf("Invalid choice (numbers only).\n");
+		SetConsoleTextAttribute(h, 12);
+		printf("Invalid choice (numbers only).\n");
+		SetConsoleTextAttribute(h, 10);
 	    return;
 	}
 	int c = atoi(choice);
@@ -108,14 +114,18 @@ void view_students_in_course(const char *teacherID) {
 	}
 	// Check if number is within the available courses
 	if (c < 1 || c > numCourses) {  // numCourses = total courses in teacherCourses array
-    	printf("Invalid choice: please select only avaiable course.\n");
+		SetConsoleTextAttribute(h, 12);
+		printf("Invalid choice: please select only avaiable course.\n");
+		SetConsoleTextAttribute(h, 10);
     	return;
 	}
     char *selectedCourse = teacherCourses[c - 1];
     // --- Step 3: List students in the selected course ---
     FILE *sf = fopen("data/student_courses.csv", "r");
     if (!sf) {
-        printf("Students file not found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Students file not found!\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     int studentFound = 0;
@@ -143,24 +153,31 @@ void view_students_in_course(const char *teacherID) {
     }
     fclose(sf);
     if (!studentFound) {
-        printf("No students enrolled in %s.\n", selectedCourse);
+    	SetConsoleTextAttribute(h, 12);
+		printf("No students enrolled in %s.\n", selectedCourse);
+		SetConsoleTextAttribute(h, 10);
     }
 }
 
 void change_teacher_password(const char *teacherID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char currentPass[50], newPass[50], confirmPass[50];
     char line[512];
     int found = 0;
     read_password(currentPass, sizeof(currentPass), "Enter current password");
     FILE *f = fopen("data/teachers.csv", "r");
     if (!f) {
-        printf("Teachers file not found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Teachers file not found!\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     FILE *temp = fopen("data/temp.csv", "w");
     if (!temp) {
         fclose(f);
-        printf("Failed to create temp file!\n");
+        SetConsoleTextAttribute(h, 12);
+		printf("Failed to create temp file!\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     while (fgets(line, sizeof(line), f)) {
@@ -177,7 +194,9 @@ void change_teacher_password(const char *teacherID) {
         if (strcmp(tid, teacherID) == 0) {
             found = 1;
             if (strcmp(currentPass, tpass) != 0) {
-                printf("Incorrect current password!\n");
+            	SetConsoleTextAttribute(h, 12);
+				printf("Incorrect current password!\n");
+				SetConsoleTextAttribute(h, 10);
                 fputs(line, temp); // keep old password
                 continue;
             }
@@ -186,7 +205,9 @@ void change_teacher_password(const char *teacherID) {
                 read_password(newPass, sizeof(newPass), "Enter new password");
                 read_password(confirmPass, sizeof(confirmPass), "Confirm new password");
                 if (strcmp(newPass, confirmPass) != 0) {
-                    printf("Passwords do not match! Try again.\n");
+                	SetConsoleTextAttribute(h, 12);
+					printf("Passwords do not match! Try again.\n");
+					SetConsoleTextAttribute(h, 10);
                 } else {
                     break;
                 }
@@ -202,7 +223,9 @@ void change_teacher_password(const char *teacherID) {
     fclose(temp);
 
     if (!found) {
-        printf("Teacher ID not found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Teacher ID not found!\n");
+		SetConsoleTextAttribute(h, 10);
         remove("data/temp.csv");
         return;
     }
@@ -211,11 +234,17 @@ void change_teacher_password(const char *teacherID) {
 }
 
 void upload_marks(const char *teacherID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     // 1. Get teacher's assigned courses
     char teacherCourses[4][20];
     int numCourses = 0;
     FILE *f = fopen("data/teacher_courses.csv", "r");
-    if (!f) { printf("Teacher courses file not found!\n"); return; }
+    if (!f) {
+    	SetConsoleTextAttribute(h, 12);
+		printf("Teacher courses file not found!\n"); 
+		SetConsoleTextAttribute(h, 10);
+		return; 
+	}
     char line[512];
     while (fgets(line, sizeof(line), f)) {
         char copy[512]; strcpy(copy, line);
@@ -233,7 +262,12 @@ void upload_marks(const char *teacherID) {
         break;
     }
     fclose(f);
-    if (numCourses == 0) { printf("No courses assigned.\n"); return; }
+    if (numCourses == 0) {
+    	SetConsoleTextAttribute(h, 12);
+		printf("No courses assigned.\n");
+		SetConsoleTextAttribute(h, 10);
+		return; 
+	}
     // 2. Select course
     printf("\n--- Assigned Courses ---\n");
     int i;
@@ -241,13 +275,28 @@ void upload_marks(const char *teacherID) {
         printf("%d. %s\n", i+1, teacherCourses[i]);
     char choice[10];
     read_line("Select course number to upload marks", choice, sizeof(choice));
-    if (!is_number(choice)) { printf("Invalid input!\n"); return; }
+    if (!is_number(choice)) { 
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid input!\n"); 
+		SetConsoleTextAttribute(h, 10);
+		return; 
+	}
     int c = atoi(choice);
-    if (c < 1 || c > numCourses) { printf("Invalid course choice!\n"); return; }
+    if (c < 1 || c > numCourses) { 
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid course choice!\n"); 
+		SetConsoleTextAttribute(h, 10);
+		return; 
+	}
     char *selectedCourse = teacherCourses[c-1];
     // 3. Load all students enrolled in that course
     FILE *sf = fopen("data/student_courses.csv", "r");
-    if (!sf) { printf("Student courses file not found!\n"); return; }
+    if (!sf) {
+    	SetConsoleTextAttribute(h, 12);
+		printf("Student courses file not found!\n"); 
+		SetConsoleTextAttribute(h, 10);
+		return; 
+	}
     char students[100][2][50];
     int studentCount = 0;
     while (fgets(line, sizeof(line), sf)) {
@@ -269,7 +318,12 @@ void upload_marks(const char *teacherID) {
         }
     }
     fclose(sf);
-    if (studentCount == 0) { printf("No students enrolled in %s.\n", selectedCourse); return; }
+    if (studentCount == 0) {
+    	SetConsoleTextAttribute(h, 12);
+		printf("No students enrolled in %s.\n", selectedCourse); 
+		SetConsoleTextAttribute(h, 10);
+		return; 
+	}
     // 4. Display all students
     printf("\n--- Students in %s ---\n", selectedCourse);
     printf("------------------------------------------------\n");
@@ -349,12 +403,17 @@ void upload_marks(const char *teacherID) {
                 break;
             }
         }
-        if (!found) printf("Invalid Student ID!\n");
+        if (!found){
+        	SetConsoleTextAttribute(h, 12);
+			printf("Invalid Student ID!\n");
+			SetConsoleTextAttribute(h, 10);
+		} 
     }
     printf("Finished uploading marks for course %s.\n", selectedCourse);
 }
 
 void view_course_student_marks(const char *teacherID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char teacherCourses[4][20];
     int numCourses = 0;
     FILE *f = fopen("data/teacher_courses.csv", "r");
@@ -379,7 +438,12 @@ void view_course_student_marks(const char *teacherID) {
     }
     fclose(f);
 
-    if (numCourses == 0) { printf("No courses assigned.\n"); return; }
+    if (numCourses == 0) {
+    	SetConsoleTextAttribute(h, 12);
+		printf("No courses assigned.\n"); 
+		SetConsoleTextAttribute(h, 10);
+		return; 
+	}
 
     // --- Select course ---
     printf("\n--- Assigned Courses ---\n");
@@ -389,9 +453,19 @@ void view_course_student_marks(const char *teacherID) {
 
     char choice[10];
     read_line("Select course number to view student marks", choice, sizeof(choice));
-    if (!is_number(choice)) { printf("Invalid input!\n"); return; }
+    if (!is_number(choice)) {
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid input!\n"); 
+		SetConsoleTextAttribute(h, 10);
+		return; 
+	}
     int c = atoi(choice);
-    if (c < 1 || c > numCourses) { printf("Invalid course choice!\n"); return; }
+    if (c < 1 || c > numCourses) {
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid course choice!\n"); 
+		SetConsoleTextAttribute(h, 10);
+		return; 
+	}
 
     char *selectedCourse = teacherCourses[c-1];
 
@@ -424,7 +498,9 @@ void view_course_student_marks(const char *teacherID) {
     fclose(sf);
 
     if (studentCount == 0) {
-        printf("No students enrolled in %s.\n", selectedCourse);
+    	SetConsoleTextAttribute(h, 12);
+		printf("No students enrolled in %s.\n", selectedCourse);
+		SetConsoleTextAttribute(h, 10);
         return;
     }
 

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <windows.h>
 #include "../include/utils.h"
 #include "../include/teacher_quiz.h"
 
@@ -89,6 +90,7 @@
 //}
 
 void create_quiz(const char *teacherID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char teacherCourses[4][20];
     int numCourses = load_teacher_courses(teacherID, teacherCourses);
     if (numCourses == 0) {
@@ -103,12 +105,16 @@ void create_quiz(const char *teacherID) {
     char buf[10];
     read_line("Enter course number", buf, sizeof(buf));
     if (!is_number(buf)) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Invalid input.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     int choice = atoi(buf);
     if (choice < 1 || choice > numCourses) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Invalid course selection.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     char courseID[20];
@@ -116,28 +122,38 @@ void create_quiz(const char *teacherID) {
     char quizID[20], title[100];
     read_line("Quiz ID", quizID, sizeof(quizID));
     if (!strlen(quizID)) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Quiz ID cannot be empty.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     if (quiz_id_exists(quizID)) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Quiz ID '%s' already exists. Please choose a unique ID.\n", quizID);
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     read_line("Quiz Title", title, sizeof(title));
     if (!strlen(title)) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Quiz title cannot be empty.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     read_line("Total Questions", buf, sizeof(buf));
     if (!is_number(buf) || atoi(buf) <= 0) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Invalid number of questions.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     int totalQ = atoi(buf);
     /* NEW: Time limit */
     read_line("Time Limit (minutes)", buf, sizeof(buf));
     if (!is_number(buf) || atoi(buf) <= 0) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Invalid time limit.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     int timeLimit = atoi(buf);
@@ -163,12 +179,16 @@ void create_quiz(const char *teacherID) {
         read_line("Option C", C, sizeof(C));
         read_line("Option D", D, sizeof(D));
         if (!strlen(A) || !strlen(B) || !strlen(C) || !strlen(D)) {
-            printf("Options cannot be empty.\n");
+        	SetConsoleTextAttribute(h, 12);
+		    printf("Options cannot be empty.\n");
+			SetConsoleTextAttribute(h, 10);
             i--; continue;
         }
         read_line("Correct Option (A/B/C/D)", correct, sizeof(correct));
         if (strlen(correct) != 1 || !strchr("ABCD", correct[0])) {
-            printf("Invalid correct option.\n");
+        	SetConsoleTextAttribute(h, 12);
+		    printf("Invalid correct option.\n");
+			SetConsoleTextAttribute(h, 10);
             i--; continue;
         }
         fprintf(qq, "%s,%d,%s,%s,%s,%s,%s,%s\n",
@@ -181,6 +201,7 @@ void create_quiz(const char *teacherID) {
 
 
 void view_my_quizzes(const char *teacherID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char teacherCourses[4][20];
     int numCourses = load_teacher_courses(teacherID, teacherCourses);
     if (numCourses == 0) {
@@ -196,12 +217,16 @@ void view_my_quizzes(const char *teacherID) {
     char buf[10];
     read_line("Enter course number", buf, sizeof(buf));
     if (!is_number(buf)) {
-        printf("Invalid input.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid input.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     int c = atoi(buf);
     if (c < 1 || c > numCourses) {
-        printf("Invalid course selection.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid course selection.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char selectedCourse[20];
@@ -209,7 +234,9 @@ void view_my_quizzes(const char *teacherID) {
     /* --- Load quizzes for this course --- */
     FILE *fq = fopen("data/quizzes.csv", "r");
     if (!fq) {
-        printf("No quizzes found.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No quizzes found.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[512];
@@ -234,7 +261,9 @@ void view_my_quizzes(const char *teacherID) {
     }
     fclose(fq);
     if (quizCount == 0) {
-        printf("No quizzes found for this course.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No quizzes found for this course.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     /* --- Select Quiz --- */
@@ -244,12 +273,16 @@ void view_my_quizzes(const char *teacherID) {
     }
     read_line("Enter quiz number", buf, sizeof(buf));
     if (!is_number(buf)) {
-        printf("Invalid input.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid input.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     int q = atoi(buf);
     if (q < 1 || q > quizCount) {
-        printf("Invalid quiz selection.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid quiz selection.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char selectedQuizID[20];
@@ -277,7 +310,9 @@ void view_my_quizzes(const char *teacherID) {
     /* --- Display Questions --- */
     FILE *qq = fopen("data/quiz_questions.csv", "r");
     if (!qq) {
-        printf("Questions file not found.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Questions file not found.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     printf("--- Questions ---\n");
@@ -305,10 +340,13 @@ void view_my_quizzes(const char *teacherID) {
 }
 
 void delete_quiz(const char *teacherID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char teacherCourses[4][20];
     int numCourses = load_teacher_courses(teacherID, teacherCourses);
     if (numCourses == 0) {
-        printf("You have no assigned courses.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("You have no assigned courses.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     /* --- Select Course --- */
@@ -320,12 +358,16 @@ void delete_quiz(const char *teacherID) {
     char buf[10];
     read_line("Enter course number", buf, sizeof(buf));
     if (!is_number(buf)) {
-        printf("Invalid input.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid input.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     int c = atoi(buf);
     if (c < 1 || c > numCourses) {
-        printf("Invalid course selection.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid course selection.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char selectedCourse[20];
@@ -333,7 +375,9 @@ void delete_quiz(const char *teacherID) {
     /* --- Load quizzes for course --- */
     FILE *fq = fopen("data/quizzes.csv", "r");
     if (!fq) {
-        printf("No quizzes found.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No quizzes found.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char quizIDs[20][20];
@@ -357,7 +401,9 @@ void delete_quiz(const char *teacherID) {
     }
     fclose(fq);
     if (quizCount == 0) {
-        printf("No quizzes found for this course.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No quizzes found for this course.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     /* --- Select Quiz --- */
@@ -367,12 +413,16 @@ void delete_quiz(const char *teacherID) {
     }
     read_line("Enter quiz number", buf, sizeof(buf));
     if (!is_number(buf)) {
-        printf("Invalid input.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid input.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
 	}
     int q = atoi(buf);
     if (q < 1 || q > quizCount) {
-        printf("Invalid quiz selection.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid quiz selection.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char selectedQuizID[20];
@@ -417,6 +467,7 @@ void delete_quiz(const char *teacherID) {
 }
 
 void update_quiz(const char *teacherID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char quizIDs[20][20], titles[20][100];
     int quizCount = load_teacher_quizzes(teacherID, quizIDs, titles);
     if (quizCount == 0) {
@@ -433,7 +484,9 @@ void update_quiz(const char *teacherID) {
     if (!is_number(buf)) return;
     int choice = atoi(buf);
     if (choice < 1 || choice > quizCount) {
-        printf("Invalid selection.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Invalid selection.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char selectedQuiz[20];
@@ -442,9 +495,12 @@ void update_quiz(const char *teacherID) {
 }
 
 void edit_quiz_questions(const char *quizID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen("data/quiz_questions.csv", "r");
     if (!f) {
-        printf("Questions file not found.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Questions file not found.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[1024];
@@ -463,7 +519,9 @@ void edit_quiz_questions(const char *quizID) {
     }
     fclose(f);
     if (questionCount == 0) {
-        printf("No questions found.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No questions found.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char buf[10];
@@ -474,6 +532,7 @@ void edit_quiz_questions(const char *quizID) {
 }
 
 void update_single_question(const char *quizID, int qno) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen("data/quiz_questions.csv", "r");
     FILE *temp = fopen("data/temp.csv", "w");
     if (!f || !temp) return;
@@ -527,8 +586,11 @@ void update_single_question(const char *quizID, int qno) {
     rename("data/temp.csv", "data/quiz_questions.csv");
     if (found)
         printf("Question updated successfully!\n");
-    else
-        printf("Question not found.\n");
+    else{
+    	SetConsoleTextAttribute(h, 12);
+		printf("Question not found.\n");
+		SetConsoleTextAttribute(h, 10);
+	}
 }
 
 

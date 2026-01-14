@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>  // for isspace()
+#include <windows.h>
 #include "../include/fileio.h"
 #include "../include/utils.h"
 
@@ -15,9 +16,12 @@
 
 //Student Management
 int add_student(const char *id, const char *name, const char *dept, const char *pass) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(STUDENTS_FILE, "a");
     if (!f) {
-        printf("Failed to open students file!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Failed to open students file!\n");
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     fprintf(f, "%s,%s,%s,%s\n", id, name, dept, pass);
@@ -27,9 +31,12 @@ int add_student(const char *id, const char *name, const char *dept, const char *
 }
 
 void list_students(void) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(STUDENTS_FILE, "r");
     if (!f) {
-        printf("No students found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No students found!\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[LINE_LEN];
@@ -51,9 +58,12 @@ void list_students(void) {
 }
 
 int delete_student(const char *roll) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(STUDENTS_FILE, "r");
     if (!f) {
-        printf("No students found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No students found!\n");
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     FILE *temp = fopen("data/temp.csv", "w");
@@ -81,15 +91,21 @@ int delete_student(const char *roll) {
     rename("data/temp.csv", STUDENTS_FILE);
     if (found)
         printf("Student with ID %s deleted successfully!\n", roll);
-    else
-        printf("Student not found!\n");
+    else{
+    	SetConsoleTextAttribute(h, 12);
+		printf("Student not found!\n");
+		SetConsoleTextAttribute(h, 10);
+	}
     return found;
 }
 
 int update_student(const char *id, const char *newName, const char *newDept, const char *newPass) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(STUDENTS_FILE, "r");
     if (!f) {
-        printf("No students found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No students found!\n");
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     FILE *temp = fopen("data/temp.csv", "w");
@@ -139,15 +155,21 @@ int update_student(const char *id, const char *newName, const char *newDept, con
     rename("data/temp.csv", STUDENTS_FILE);
     if (found)
         printf("Student with ID %s updated successfully!\n", id);
-    else
-        printf("Student not found!\n");
+    else{
+    	SetConsoleTextAttribute(h, 12);
+		printf("Student not found!\n");
+		SetConsoleTextAttribute(h, 10);
+	}
     return found;
 }
 
 void search_student(const char *id) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(STUDENTS_FILE, "r");
     if (!f) {
-        printf("No students found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No students found!\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[LINE_LEN];
@@ -182,7 +204,9 @@ void search_student(const char *id) {
         }
     }
     if (!found) {
-        printf("Student with ID %s not found!\n", id);
+    	SetConsoleTextAttribute(h, 12);
+		printf("Student with ID %s not found!\n", id);
+		SetConsoleTextAttribute(h, 10);
     }
     fclose(f);
 }
@@ -190,9 +214,12 @@ void search_student(const char *id) {
 
 //Teacher Management
 int add_teacher(const char *id, const char *name, const char *dept, const char *pass) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(TEACHERS_FILE, "a");
     if (!f) {
-        printf("Failed to open teachers file!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Failed to open teachers file!\n");
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     fprintf(f, "%s,%s,%s,%s\n", id, name, dept, pass);
@@ -202,9 +229,12 @@ int add_teacher(const char *id, const char *name, const char *dept, const char *
 }
 
 void list_teachers(void) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(TEACHERS_FILE, "r");
     if (!f) {
-        printf("No teachers found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No teachers found!\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[256];
@@ -232,9 +262,12 @@ void list_teachers(void) {
 }
 
 int delete_teacher(const char *id) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(TEACHERS_FILE, "r");
     if (!f) {
-        printf("No teachers found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No teachers found!\n");
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     FILE *temp = fopen("data/temp.csv", "w");
@@ -262,15 +295,21 @@ int delete_teacher(const char *id) {
     rename("data/temp.csv", TEACHERS_FILE);
     if (found)
         printf("Teacher with ID %s deleted successfully!\n", id);
-    else
-        printf("Teacher not found!\n");
+    else{
+    	SetConsoleTextAttribute(h, 12);
+		printf("Teacher not found!\n");
+		SetConsoleTextAttribute(h, 10);
+	}
     return found;
 }
 
 int update_teacher(const char *id, const char *newName, const char *newDept, const char *newPass) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(TEACHERS_FILE, "r");
     if (!f) {
-        printf("No teachers found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No teachers found!\n");
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     FILE *temp = fopen("data/temp.csv", "w");
@@ -310,15 +349,21 @@ int update_teacher(const char *id, const char *newName, const char *newDept, con
     rename("data/temp.csv", TEACHERS_FILE);
     if (found)
         printf("Teacher with ID %s updated successfully!\n", id);
-    else
-        printf("Teacher not found!\n");
+    else{
+    	SetConsoleTextAttribute(h, 12);
+		printf("Teacher not found!\n");
+		SetConsoleTextAttribute(h, 10);
+	}
     return found;
 }
 
 void search_teacher(const char *id) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(TEACHERS_FILE, "r");
     if (!f) {
-        printf("No teachers found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No teachers found!\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[256];
@@ -343,15 +388,22 @@ void search_teacher(const char *id) {
             break;
         }
     }
-    if (!found) printf("Teacher with ID %s not found!\n", id);
+    if (!found){
+    	SetConsoleTextAttribute(h, 12);
+		printf("Teacher with ID %s not found!\n", id);
+		SetConsoleTextAttribute(h, 10);
+	} 
     fclose(f);
 }
 
 //Course Management
 int add_course(const char *courseID, const char *name, int credits) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(COURSES_FILE, "a");
     if (!f) {
-        printf("Failed to open courses file!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Failed to open courses file!\n");
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     fprintf(f, "%s,%s,%d\n", courseID, name, credits);
@@ -361,9 +413,12 @@ int add_course(const char *courseID, const char *name, int credits) {
 }
 
 void list_courses(void) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(COURSES_FILE, "r");
     if (!f) {
-        printf("No courses found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No courses found!\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[256];
@@ -386,9 +441,12 @@ void list_courses(void) {
 }
 
 int update_course(const char *courseID, const char *newName, int *newCredits) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(COURSES_FILE, "r");
     if (!f) {
-        printf("No Courses found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No Courses found!\n");
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     FILE *temp = fopen("data/temp.csv", "w");
@@ -423,15 +481,21 @@ int update_course(const char *courseID, const char *newName, int *newCredits) {
     rename("data/temp.csv", COURSES_FILE);
     if (found)
         printf("Course with course ID %s updated successfully!\n", courseID);
-    else
-        printf("Course with course ID %s not found!\n", courseID);
+    else{
+    	SetConsoleTextAttribute(h, 12);
+		printf("Course with course ID %s not found!\n", courseID);
+		SetConsoleTextAttribute(h, 10);
+	}
     return found;
 }
 
 int delete_course(const char *courseID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen(COURSES_FILE, "r");
     if (!f) {
-        printf("No courses found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No courses found!\n");
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     FILE *temp = fopen("data/temp.csv", "w");
@@ -459,35 +523,47 @@ int delete_course(const char *courseID) {
     rename("data/temp.csv", COURSES_FILE);
     if (found)
         printf("Course with course ID %s deleted successfully!\n", courseID);
-    else
-        printf("Course with course ID %s not found!\n", courseID);
+    else{
+    	SetConsoleTextAttribute(h, 12);
+		printf("Course with course ID %s not found!\n", courseID);
+		SetConsoleTextAttribute(h, 10);
+	}
     return found;
 }
 
 
 //Student Course Management
 int assign_course_to_student(const char *studentID, const char *courseID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char name[50]="", dept[50]="";
     // --- 1. Get student info
     if (!get_student_info(studentID, name, dept)) {
-        printf("Student '%s' not found!\n", studentID);
+    	SetConsoleTextAttribute(h, 12);
+		printf("Student '%s' not found!\n", studentID);
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     // --- 2. Check course exists
     if (!course_exists(courseID)) {
-        printf("Course '%s' does not exist!\n", courseID);
+    	SetConsoleTextAttribute(h, 12);
+		printf("Course '%s' does not exist!\n", courseID);
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     // --- 3. Prevent duplicate course
     if (student_has_course(studentID, courseID)) {
-        printf("Course '%s' already assigned to this student.\n", courseID);
+    	SetConsoleTextAttribute(h, 12);
+		printf("Course '%s' already assigned to this student.\n", courseID);
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     // --- 4. Check credit limit
     int currentCredits = get_student_total_credits(studentID);
     int newCredits = get_course_credits(courseID);
     if (currentCredits + newCredits > MAX_CREDITS) {
+    	SetConsoleTextAttribute(h, 12);
 		printf("\nCannot assign course '%s' to student '%s'!\n", courseID, studentID);
+		SetConsoleTextAttribute(h, 10);
 		printf("Current Credits : %d\n", currentCredits);
 	    printf("Course(%s) Credits : %d\n",courseID, newCredits);
 	    printf("Maximum Allowed : %d\n", MAX_CREDITS);
@@ -528,9 +604,12 @@ int assign_course_to_student(const char *studentID, const char *courseID) {
 }
 
 void list_student_courses(const char *studentID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen("data/student_courses.csv", "r");
     if (!f) {
-        printf("No course assignments found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No course assignments found!\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[512];
@@ -575,15 +654,21 @@ void list_student_courses(const char *studentID) {
         printf("\nTotal Credits: %d / %d\n", totalCredits, MAX_CREDITS);
         break;  // found the student, no need to read more
     }
-    if (!found)
-        printf("No courses assigned to student ID '%s'.\n", studentID);
+    if (!found){
+    	SetConsoleTextAttribute(h, 12);
+		printf("No courses assigned to student ID '%s'.\n", studentID);
+		SetConsoleTextAttribute(h, 10);
+	}
     fclose(f);
 }
 
 int remove_course_from_student(const char *studentID, const char *courseID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen("data/student_courses.csv", "r");
     if (!f) {
-        printf("No course assignments file found!\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No course assignments file found!\n");
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     FILE *temp = fopen("data/temp.csv", "w");
@@ -622,7 +707,9 @@ int remove_course_from_student(const char *studentID, const char *courseID) {
             }
         }
         if (!course_found) {
-            printf("Course '%s' not found for this student.\n", courseID);
+        	SetConsoleTextAttribute(h, 12);
+			printf("Course '%s' not found for this student.\n", courseID);
+			SetConsoleTextAttribute(h, 10);
             fputs(line, temp);
             continue;
         }
@@ -642,7 +729,9 @@ int remove_course_from_student(const char *studentID, const char *courseID) {
     remove("data/student_courses.csv");
     rename("data/temp.csv", "data/student_courses.csv");
     if (!found_student) {
-        printf("Student with ID %s not found in assignment file.\n", studentID);
+    	SetConsoleTextAttribute(h, 12);
+		printf("Student with ID %s not found in assignment file.\n", studentID);
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     if (!removed_course) {
@@ -653,11 +742,14 @@ int remove_course_from_student(const char *studentID, const char *courseID) {
 }
 
 void calculate_student_gpa() {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char studentID[20];
     read_line("Enter Student ID", studentID, sizeof(studentID));
     FILE *fm = fopen("data/course_marks.csv", "r");
     if (!fm) {
-        printf("Marks file not found.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Marks file not found.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     float totalWeighted = 0.0;
@@ -690,7 +782,9 @@ void calculate_student_gpa() {
             
             int credit = get_course_credits(courseID);
             if (credit <= 0) {
-			    printf("Warning: Credit hours not found for %s\n", courseID);
+            	SetConsoleTextAttribute(h, 12);
+				printf("Warning: Credit hours not found for %s\n", courseID);
+				SetConsoleTextAttribute(h, 10);
 			    continue;
 			}
 			else{
@@ -705,13 +799,17 @@ void calculate_student_gpa() {
     }
     fclose(fm);
     if (!found || totalCredits == 0) {
-        printf("No complete data found for GPA calculation.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No complete data found for GPA calculation.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     float gpa = totalWeighted / totalCredits;
     FILE *fg = fopen("data/student_gpa.csv", "w");
     if (!fg) {
-        printf("Unable to save GPA.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Unable to save GPA.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     fprintf(fg, "%s,%.2f\n", studentID, gpa);
@@ -750,21 +848,28 @@ int get_teacher_info(const char *id, char *name, char *dept) {
 }
 
 int assign_course_to_teacher(const char *teacherID, const char *courseID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char name[50], dept[50];
     // 1. Validate teacher
     if (!get_teacher_info(teacherID, name, dept)) {
-        printf("Teacher '%s' not found!\n", teacherID);
+    	SetConsoleTextAttribute(h, 12);
+		printf("Teacher '%s' not found!\n", teacherID);
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     // 2. Validate course
     if (!course_exists(courseID)) {
-        printf("Course '%s' does not exist!\n", courseID);
+    	SetConsoleTextAttribute(h, 12);
+		printf("Course '%s' does not exist!\n", courseID);
+		SetConsoleTextAttribute(h, 10);
         return 0;
     }
     // 3. Enforce course limit
     int currentCount = get_teacher_course_count(teacherID);
     if (currentCount >= MAX_TEACHER_COURSES) {
-        printf("Cannot assign course.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("Cannot assign course.\n");
+		SetConsoleTextAttribute(h, 10);
         printf("Teacher already has %d out of %d courses.\n",
                currentCount, MAX_TEACHER_COURSES);
         return 0;
@@ -799,7 +904,9 @@ int assign_course_to_teacher(const char *teacherID, const char *courseID) {
                     }
                 }
                 if (duplicate) {
-                    printf("Course '%s' already assigned to this teacher.\n", courseID);
+                	SetConsoleTextAttribute(h, 12);
+					printf("Course '%s' already assigned to this teacher.\n", courseID);
+					SetConsoleTextAttribute(h, 10);
                     fputs(original, temp);
                 } else {
                     original[strcspn(original, "\n")] = '\0';
@@ -824,9 +931,12 @@ int assign_course_to_teacher(const char *teacherID, const char *courseID) {
 }
 
 void list_teacher_courses(const char *teacherID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen("data/teacher_courses.csv", "r");
     if (!f) {
-        printf("No teacher course records found.\n");
+    	SetConsoleTextAttribute(h, 12);
+		printf("No teacher course records found.\n");
+		SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[512];
@@ -858,12 +968,16 @@ void list_teacher_courses(const char *teacherID) {
         }
         break;
     }
-    if (!found)
-        printf("No courses assigned to teacher '%s'.\n", teacherID);
+    if (!found){
+    	SetConsoleTextAttribute(h, 12);
+		printf("No courses assigned to teacher '%s'.\n", teacherID);
+		SetConsoleTextAttribute(h, 10);
+	}
     fclose(f);
 }
 
 int remove_course_from_teacher(const char *teacherID, const char *courseID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen("data/teacher_courses.csv", "r");
     if (!f) return 0;
     FILE *temp = fopen("data/temp.csv", "w");
@@ -900,8 +1014,16 @@ int remove_course_from_teacher(const char *teacherID, const char *courseID) {
     fclose(temp);
     remove("data/teacher_courses.csv");
     rename("data/temp.csv", "data/teacher_courses.csv");
-    if (!found) printf("Teacher '%s' not found.\n",teacherID);
-    else if (!removed) printf("Course '%s' not found for this teacher.\n",courseID);
+    if (!found){
+    	SetConsoleTextAttribute(h, 12);
+		printf("Teacher '%s' not found.\n",teacherID);
+		SetConsoleTextAttribute(h, 10);
+	} 
+    else if (!removed){
+    	SetConsoleTextAttribute(h, 12);
+		printf("Course '%s' not found for this teacher.\n",courseID);
+		SetConsoleTextAttribute(h, 10);
+	} 
     else printf("Course '%s' removed successfully.\n", courseID);
     return removed;
 }

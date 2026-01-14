@@ -2,19 +2,23 @@
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
+#include <windows.h>
 #include "../include/utils.h"
 #include "../include/student.h"
 
 #define STUDENT_COURSES_FILE "data/student_courses.csv"
 
 void view_student_courses(const char *studentID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char sid[20];
     strncpy(sid, studentID, sizeof(sid)-1);
     sid[sizeof(sid)-1] = '\0';
     trim(sid);
     FILE *f = fopen("data/student_courses.csv", "r");
     if (!f) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Student courses file not found!\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[512];
@@ -62,9 +66,12 @@ void view_student_courses(const char *studentID) {
 }
 
 void view_student_marks(const char *studentID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen("data/course_marks.csv", "r");
     if (!f) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Marks file not found!\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     char sid[20];
@@ -100,6 +107,7 @@ void view_student_marks(const char *studentID) {
 }
 
 void attempt_quiz(const char *studentID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     char quizIDs[20][20];
     char quizTitles[20][100];
     int num = load_available_quizzes(studentID, quizIDs, quizTitles, 20);
@@ -115,12 +123,16 @@ void attempt_quiz(const char *studentID) {
     char buf[10];
     read_line("Select quiz number", buf, sizeof(buf));
     if (!is_number(buf)) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Invalid input.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     int choice = atoi(buf);
     if (choice < 1 || choice > num) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Invalid quiz selection.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     char quizID[20];
@@ -179,6 +191,7 @@ void attempt_quiz(const char *studentID) {
 //}
 
 int conduct_quiz(const char *quizID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     int timeLimitMin = get_quiz_time_limit(quizID);
     if (timeLimitMin <= 0) {
         printf("Quiz time limit not found.\n");
@@ -188,7 +201,9 @@ int conduct_quiz(const char *quizID) {
     int timeLimitSec = timeLimitMin * 60;
     FILE *f = fopen("data/quiz_questions.csv", "r");
     if (!f) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Quiz questions file not found.\n");
+    	SetConsoleTextAttribute(h, 10);
         return 0;
     }
     char line[512];
@@ -235,6 +250,7 @@ int conduct_quiz(const char *quizID) {
 }
 
 void view_quiz_result(const char *studentID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *fr = fopen("data/quiz_results.csv", "r");
     if (!fr) {
         printf("No quiz results available.\n");
@@ -270,12 +286,16 @@ void view_quiz_result(const char *studentID) {
     char buf[10];
     read_line("Select quiz number", buf, sizeof(buf));
     if (!is_number(buf)) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Invalid input.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     int choice = atoi(buf);
     if (choice < 1 || choice > count) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Invalid selection.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     char selectedQuiz[20];
@@ -319,15 +339,20 @@ void view_quiz_result(const char *studentID) {
 }
 
 void student_change_password(const char *studentID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen("data/students.csv", "r");
     if (!f) {
+    	SetConsoleTextAttribute(h, 12);
         printf("Students file not found.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     FILE *temp = fopen("data/students_temp.csv", "w");
     if (!temp) {
         fclose(f);
+        SetConsoleTextAttribute(h, 12);
         printf("Error creating temp file.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     char current[50], newpass[50], confirm[50];
@@ -350,19 +375,25 @@ void student_change_password(const char *studentID) {
         if (strcmp(id, studentID) == 0) {
             found = 1;
             if (strcmp(pass, current) != 0) {
-                printf("Incorrect current password.\n");
+            	SetConsoleTextAttribute(h, 12);
+		        printf("Incorrect current password.\n");
+		    	SetConsoleTextAttribute(h, 10);
                 fputs(line, temp);
                 continue;
             }
             read_line("Enter new password", newpass, sizeof(newpass));
             if (strlen(newpass) == 0) {
-                printf("New password cannot be empty.\n");
+            	SetConsoleTextAttribute(h, 12);
+		        printf("New password cannot be empty.\n");
+		    	SetConsoleTextAttribute(h, 10);
                 fputs(line, temp);
                 continue;
             }
             read_line("Confirm new password", confirm, sizeof(confirm));
             if (strcmp(newpass, confirm) != 0) {
-                printf("Passwords do not match.\n");
+            	SetConsoleTextAttribute(h, 12);
+		        printf("Passwords do not match.\n");
+		    	SetConsoleTextAttribute(h, 10);
                 fputs(line, temp);
                 continue;
             }
@@ -377,7 +408,9 @@ void student_change_password(const char *studentID) {
     fclose(temp);
     if (!found) {
         remove("data/students_temp.csv");
+        SetConsoleTextAttribute(h, 12);
         printf("Student record not found.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     if (!updated) {
@@ -390,9 +423,12 @@ void student_change_password(const char *studentID) {
 }
 
 void view_student_gpa(const char *studentID) {
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     FILE *f = fopen("data/student_gpa.csv", "r");
     if (!f) {
+    	SetConsoleTextAttribute(h, 12);
         printf("\n[GPA Error] student_gpa.csv not found.\n");
+    	SetConsoleTextAttribute(h, 10);
         return;
     }
     char line[128];

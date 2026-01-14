@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <windows.h>
 #include "../include/utils.h"
 #include "../include/student.h"
 
@@ -44,6 +45,10 @@ int student_login(char *name_buffer, int size) {
 // --- Student Menu ---
 void student_menu(const char *studentID) {
     char choice[10];
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(h, 14);
+    student_banner();
+	SetConsoleTextAttribute(h, 10);
     while (1) {
         printf("\n--- Student Menu ---\n");
         printf("1. View My Enrolled Courses\n");
@@ -55,7 +60,9 @@ void student_menu(const char *studentID) {
         printf("0. Logout\n");
         read_line("Enter choice", choice, sizeof(choice));
         if (!is_number(choice)) {
-            printf("Invalid choice (numbers only).\n");
+        	SetConsoleTextAttribute(h, 12);
+	        printf("Invalid choice (numbers only).\n");
+	        SetConsoleTextAttribute(h, 10);
             continue;
         }
         int c = atoi(choice);
@@ -79,10 +86,13 @@ void student_menu(const char *studentID) {
 		        view_student_gpa(CURRENT_STUDENT_ID);
 		        break;
             case 0:
-                printf("Logging out...\n");
+            	printf("Logging out...\n");
+				system("cls");
                 return;
             default:
-                printf("Invalid choice. Please select a valid menu option.\n");
+            	SetConsoleTextAttribute(h, 12);
+	        	printf("Invalid choice. Please select a valid menu option.\n");
+	        	SetConsoleTextAttribute(h, 10);
         }
     }
 }

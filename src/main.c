@@ -22,8 +22,8 @@ int main(void) {
         read_line("Enter choice", choice_str, sizeof(choice_str));
 	    if (!is_number(choice_str)) {
 	    	SetConsoleTextAttribute(h, 12);
-	        printf("Invalid choice (numbers only).\n");
 	        system("cls");
+	        printf("Invalid choice (numbers only).\n");
 	        SetConsoleTextAttribute(h, 10);
 	        continue;
 	    }
@@ -44,10 +44,6 @@ int main(void) {
         	char teacher_name[50];
         	if (teacher_login(teacher_name, sizeof(teacher_name))) {
         		system("cls");
-    		    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-			    SetConsoleTextAttribute(h, 14);
-			    teacher_banner();
-				SetConsoleTextAttribute(h, 10);
 		        printf("\nWelcome, %s!\n", teacher_name);
 		        teacher_menu();
 		    } else {
@@ -60,6 +56,7 @@ int main(void) {
 		else if (c == 3){
         	char student_name[50];
         	if (student_login(student_name, sizeof(student_name))) {
+        		system("cls");
 		        printf("\nWelcome, %s!\n", student_name);
 		        student_menu();
 		    } else {
@@ -85,6 +82,7 @@ int main(void) {
     return 0;
 }
 
+//ASCII banner art from patorjk.com (Standard art font):
 void main_banner(){
 	printf("  _   _       _   _     _       _      \n");
 	printf(" | | | |_ __ (_) | |   (_)_ __ | | __  \n");
@@ -98,7 +96,7 @@ void end_banner(){
 	printf(" |_   _| |__   __ _ _ __ | | __   _   _  ___  _   _    / _| ___  _ __    _   _ ___(_)_ __   __ _   | | | |_ __ (_) |   (_)_ __ | | __ \n");
 	printf("   | | | '_ \\ / _` | '_ \\| |/ /  | | | |/ _ \\| | | |  | |_ / _ \\| '__|  | | | / __| | '_ \\ / _` |  | | | | '_ \\| | |   | | '_ \\| |/ / \n"); 
 	printf("   | | | | | | (_| | | | |   <   | |_| | (_) | |_| |  |  _| (_) | |     | |_| \\__ \\ | | | | (_| |  | |_| | | | | | |___| | | | |   <  \n"); 
-	printf("   |_| |_| |_|\\__,_|_| |_|_|\\_\\   \\__, |\\___/ \\__,_|  |_|  \\___/|_|      \\__,_|___/_|_| |_|\\__, |   \\___/|_| |_|_|_____|_|_| |_|_|\\_\ \n"); 
+	printf("   |_| |_| |_|\\__,_|_| |_|_|\\_\\   \\__, |\\___/ \\__,_|  |_|  \\___/|_|      \\__,_|___/_|_| |_|\\__, |   \\___/|_| |_|_|_____|_|_| |_|_|\\_\\ \n"); 
 	printf("                                  |___/                                                    |___/                                     			 \n");
 }
 
@@ -110,3 +108,10 @@ void teacher_banner(){
 	printf("   |_|\\___|\\__,_|\\___|_| |_|\\___|_|     |_|  |_|\\___|_| |_|\\__,_|\n");                                                 
 }
 
+void student_banner(){
+printf("  ____  _             _            _     __  __                  \n");
+printf(" / ___|| |_ _   _  __| | ___ _ __ | |_  |  \\/  | ___ _ __  _   _ \n");
+printf(" \\___ \\| __| | | |/ _` |/ _ \\ '_ \\| __| | |\\/| |/ _ \\ '_ \\| | | |\n");
+printf("  ___) | |_| |_| | (_| |  __/ | | | |_  | |  | |  __/ | | | |_| |\n");
+printf(" |____/ \\__|\\__,_|\\__,_|\\___|_| |_|\\__| |_|  |_|\\___|_| |_|\\__,_|\n");                                  
+}

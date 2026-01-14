@@ -5,37 +5,29 @@
 #include "../include/admin.h"
 #include "../include/fileio.h"
 #include "../include/utils.h"
-
 int admin_login(void) {
     char user[50], pass[50];
     char line[100];
-
     printf("\n--- Admin Login ---\n");
     read_line("Username", user, sizeof(user));
     //read_line("Password", pass, sizeof(pass));
     read_password(pass, sizeof(pass), "Password");
-
     FILE *f = fopen("data/admin.txt", "r");
     if (!f) {
         printf("Error: admin.txt not found!\n");
         return 0;
     }
-
     while (fgets(line, sizeof(line), f)) {
         char *u = strtok(line, ",");
         char *p = strtok(NULL, ",");
-
         if (!u || !p) continue;
-
         char *newline = strchr(p, '\n');
         if (newline) *newline = '\0';
-
         if (strcmp(user, u) == 0 && strcmp(pass, p) == 0) {
             fclose(f);
             return 1;
         }
     }
-
     fclose(f);
     return 0;
 }
@@ -43,10 +35,10 @@ int admin_login(void) {
 void admin_menu(void) {
     char choice[10];
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(h, 14);
-	admin_banner();
-	SetConsoleTextAttribute(h, 10);
     while (1) {
+    	SetConsoleTextAttribute(h, 14);
+		admin_banner();
+		SetConsoleTextAttribute(h, 10);
         printf("\n=== Admin Menu ===\n");
         printf("1. Student Management\n");
         printf("2. Teacher Management\n");
@@ -55,7 +47,10 @@ void admin_menu(void) {
 
         read_line("Enter choice", choice, sizeof(choice));
         if (!is_number(choice)) {
+        	SetConsoleTextAttribute(h, 12);
+	        system("cls");
 	        printf("Invalid choice (numbers only).\n");
+	        SetConsoleTextAttribute(h, 10);
 	        continue;
 	    }
         int c = atoi(choice);
@@ -73,12 +68,18 @@ void admin_menu(void) {
         	system("cls");
             break;
         }
-        else printf("Invalid choice.\n");
+        else{
+        	SetConsoleTextAttribute(h, 12);
+	        system("cls");
+        	printf("Invalid choice.\n");
+        	SetConsoleTextAttribute(h, 10);
+		}
     }
 }
 
 void manage_students(void) {
 	char choice[10];
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 	while (1) {
         printf("\n--- Student Management ---\n");
         printf("1. Add Student Record\n");
@@ -88,10 +89,11 @@ void manage_students(void) {
         printf("5. Search Student Record\n");
         printf("6. GPA Calculation\n");
         printf("0. Back to Admin Menu\n");
-
         read_line("Enter choice", choice, sizeof(choice));
         if (!is_number(choice)) {
+        	SetConsoleTextAttribute(h, 12);
 	        printf("Invalid choice (numbers only).\n");
+	        SetConsoleTextAttribute(h, 10);
 	        continue;
 	    }
         int c = atoi(choice);
@@ -134,15 +136,22 @@ void manage_students(void) {
 		    search_student(roll);
 		}
 		else if (c == 6) calculate_student_gpa();
-        else if (c == 0) break;
-        else printf("Invalid choice.\n");
+        else if (c == 0){
+        	system("cls");
+        	break;	
+		} 
+        else{
+        	SetConsoleTextAttribute(h, 12);
+	        printf("Invalid choice.\n");
+	        SetConsoleTextAttribute(h, 10);
+		} 
     }
 	
 }
 
 void manage_teachers(void) {
     char choice[10];
-
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     while (1) {
         printf("\n--- Teacher Management ---\n");
         printf("1. Add Teacher Record\n");
@@ -154,7 +163,9 @@ void manage_teachers(void) {
 
         read_line("Enter choice", choice, sizeof(choice));
         if (!is_number(choice)) {
+        	SetConsoleTextAttribute(h, 12);
 	        printf("Invalid choice (numbers only).\n");
+	        SetConsoleTextAttribute(h, 10);
 	        continue;
 	    }
         int c = atoi(choice);
@@ -187,14 +198,21 @@ void manage_teachers(void) {
             read_line("Enter ID to search", id, sizeof(id));
             search_teacher(id);
         }
-        else if (c == 0) break;
-        else printf("Invalid choice.\n");
+        else if (c == 0){
+        	system("cls");
+			break;
+    	}
+        else{
+        	SetConsoleTextAttribute(h, 12);
+	        printf("Invalid choice.\n");
+	        SetConsoleTextAttribute(h, 10);
+		}
     }
 }
 
 void manage_courses(void) {
     char choice[10];
-
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     while (1) {
         printf("\n--- Course Management ---\n");
         printf("1. Add Course\n");
@@ -204,10 +222,11 @@ void manage_courses(void) {
         printf("5. Manage Student Course Assignments\n");
         printf("6. Manage Teacher Course Assignments\n");
         printf("0. Back to Admin Menu\n");
-
         read_line("Enter choice", choice, sizeof(choice));
         if (!is_number(choice)) {
+        	SetConsoleTextAttribute(h, 12);
 	        printf("Invalid choice (numbers only).\n");
+	        SetConsoleTextAttribute(h, 10);
 	        continue;
 	    }
         int c = atoi(choice);
@@ -244,22 +263,34 @@ void manage_courses(void) {
 		else if (c == 6){
 	        manage_teacher_course_assignments();
 		} 
-        else if (c == 0) break;
-        else printf("Invalid choice.\n");
+        else if (c == 0){
+        	system("cls");
+			break;
+    	}
+        else{
+        	SetConsoleTextAttribute(h, 12);
+	        printf("Invalid choice.\n");
+	        SetConsoleTextAttribute(h, 10);
+		}
     }
 }
 
 void manage_student_course_assignments(void) {
     char choice[10];
-
+	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     while (1) {
         printf("\n--- Student Course Assignments ---\n");
         printf("1. Assign Course to Student\n");
         printf("2. View Student Courses\n");
         printf("3. Remove Course From Student\n");
         printf("0. Back to Admin Menu\n");
-
         read_line("Enter choice", choice, sizeof(choice));
+        if (!is_number(choice)) {
+        	SetConsoleTextAttribute(h, 12);
+	        printf("Invalid choice (numbers only).\n");
+	        SetConsoleTextAttribute(h, 10);
+	        continue;
+	    }
         int c = atoi(choice);
 
         if (c == 1) {
@@ -287,8 +318,15 @@ void manage_student_course_assignments(void) {
 		    read_line("Enter Course ID to remove", courseID, sizeof(courseID));
 		    remove_course_from_student(studentID, courseID);
 		}
-        else if (c == 0) break;
-        else printf("Invalid choice.\n");
+        else if (c == 0){	
+        	system("cls");
+			break;
+		}
+        else{
+        	SetConsoleTextAttribute(h, 12);
+	        printf("Invalid choice.\n");
+	        SetConsoleTextAttribute(h, 10);
+		} 
     }
 }
 
@@ -331,7 +369,10 @@ void manage_teacher_course_assignments(void) {
             remove_course_from_teacher(teacherID, courseID);
         }
 
-        else if (choice == 0) break;
+        else if (choice == 0){
+        	system("cls");	
+        	break;
+		} 
         else {
             printf("Invalid choice. Try again.\n");
         }
